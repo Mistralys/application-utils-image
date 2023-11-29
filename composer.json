@@ -1,0 +1,38 @@
+{
+    "name" : "mistralys/application-utils-image",
+    "description" : "PHP image helper library for basic image operations and color management.",
+    "type" : "library",
+    "license" : "MIT",
+    "authors" : 
+    [
+        {
+            "email" : "s.mordziol@mistralys.eu",
+            "name" : "Sebastian Mordziol",
+            "role" : "Lead"
+        }
+    ],
+    "autoload" : 
+    {
+        "files" :
+        [
+            "src/ImageHelper/ImageFunctions.php"
+        ],
+        "classmap" : 
+        [
+            "src/"
+        ]
+    },
+    "minimum-stability" : "dev",
+    "prefer-stable" : true,
+    "require" : 
+    {
+        "mistralys/application-utils-core": ">=1.0.3",
+        "php": ">=7.4",
+        "ext-gd": "*"
+    },
+    "require-dev" : 
+    {
+        "phpunit/phpunit" : ">=9.6",
+        "phpstan/phpstan" : ">=1.10"
+    }
+}
