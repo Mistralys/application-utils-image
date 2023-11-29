@@ -1,0 +1,6 @@
+parameters:
+    bootstrapFiles:
+        - ./constants.php
+    paths:
+        - ../../src
+        - ../../tests
