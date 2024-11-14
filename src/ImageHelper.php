@@ -1,10 +1,6 @@
 <?php
 /**
- * File containing the {@link ImageHelper} class.
- * 
- * @package Application Utils
- * @subpackage ImageHelper
- * @see ImageHelper
+ * @package Image Helper
  */
 
 declare(strict_types=1);
@@ -14,6 +10,11 @@ namespace AppUtils;
 use AppUtils\ClassHelper\ClassNotExistsException;
 use AppUtils\ClassHelper\ClassNotImplementsException;
 use AppUtils\ImageHelper\ComputedTextSize;
+use AppUtils\ImageHelper\ImageFormats\Formats\GIFImage;
+use AppUtils\ImageHelper\ImageFormats\Formats\JPEGImage;
+use AppUtils\ImageHelper\ImageFormats\Formats\PNGImage;
+use AppUtils\ImageHelper\ImageFormats\Formats\SVGImage;
+use AppUtils\ImageHelper\ImageFormats\FormatsCollection;
 use AppUtils\ImageHelper\ImageTrimmer;
 use AppUtils\RGBAColor\ColorException;
 use AppUtils\RGBAColor\ColorFactory;
@@ -24,8 +25,7 @@ use JsonException;
  * Image helper class that can be used to transform images,
  * and retrieve information about them.
  * 
- * @package Application Utils
- * @subpackage ImageHelper
+ * @package Image Helper
  * @author Sebastian Mordziol <s.mordziol@mistralys.eu>
  */
 class ImageHelper
@@ -55,6 +55,7 @@ class ImageHelper
     public const ERROR_GD_LIBRARY_NOT_INSTALLED = 513024;
     public const ERROR_UNEXPECTED_COLOR_VALUE = 513025;
     public const ERROR_HASH_NO_IMAGE_LOADED = 513026;
+    public const ERROR_UNKNOWN_IMAGE_EXTENSION = 513027;
 
     protected string $file = '';
     protected ImageHelper_Size $info;
@@ -83,30 +84,10 @@ class ImageHelper
     protected $sourceImage;
 
     /**
-     * @var array<string,string>
-     */
-    protected static array $imageTypes = array(
-        'png' => 'png',
-        'jpg' => 'jpeg',
-        'jpeg' => 'jpeg',
-        'gif' => 'gif',
-        'svg' => 'svg'
-    );
-
-    /**
      * @var array<string,mixed>
      */
     protected static array $config = array(
         'auto-memory-adjustment' => true
-    );
-
-    /**
-     * @var string[]
-     */
-    protected static array $streamTypes = array(
-        'jpeg',
-        'png',
-        'gif'
     );
 
     /**
@@ -387,7 +368,7 @@ class ImageHelper
     protected function convolute($factor) : self
     {
         // get a value that's equal to 64 - abs( factor )
-        // ( using min/max to limit the factor to 0 - 64 to not get out of range values )
+        // ( using min/max to limit the factor from 0 to 64 to not get out of range values)
         $val1Adjustment = 64 - min( 64, max( 0, abs( $factor ) ) );
         
         // the base factor for the "current" pixel depends on if we are blurring or sharpening.
@@ -418,7 +399,7 @@ class ImageHelper
         );
         
         // calculate the correct divisor
-        // actual divisor is equal to "$divisor = $val1 + $val2 * 8;"
+        // actual divisor is equal to "$divisor = $val1 + $val2 * 8"
         // but the following line is more generic
         $divisor = array_sum( array_map( 'array_sum', $matrix ) );
         
@@ -434,7 +415,7 @@ class ImageHelper
      */
     public function isTypeSVG() : bool
     {
-        return $this->type === 'svg';
+        return $this->type === SVGImage::FORMAT_ID;
     }
     
     /**
@@ -443,7 +424,16 @@ class ImageHelper
      */
     public function isTypePNG() : bool
     {
-        return $this->type === 'png';
+        return $this->type === PNGImage::FORMAT_ID;
+    }
+
+    /**
+     * Whether the image is a GIF image.
+     * @return boolean
+     */
+    public function isTypeGIF() : bool
+    {
+        return $this->type === GIFImage::FORMAT_ID;
     }
     
     /**
@@ -452,7 +442,7 @@ class ImageHelper
      */
     public function isTypeJPEG() : bool
     {
-        return $this->type === 'jpeg';
+        return $this->type === JPEGImage::FORMAT_ID;
     }
     
     /**
@@ -513,7 +503,7 @@ class ImageHelper
 
     /**
      * Resamples the image to a new width, maintaining
-     * aspect ratio.
+     * the aspect ratio.
      *
      * @param int $width
      * @return ImageHelper
@@ -529,7 +519,7 @@ class ImageHelper
     }
 
     /**
-     * Resamples the image by height, and creates a new image file on disk.
+     * Resamples the image by height, and creates a new image file on the disk.
      *
      * @param int $height
      * @return ImageHelper
@@ -771,9 +761,9 @@ class ImageHelper
             return true;
         }
         
-        $MB = 1048576; // number of bytes in 1M
-        $K64 = 65536; // number of bytes in 64K
-        $tweakFactor = 25; // magic adjustment value as safety threshold
+        $MB = 1048576; // number of bytes in 1 M
+        $K64 = 65536; // number of bytes in 64 K
+        $tweakFactor = 25; // magic adjustment value as a safety threshold
         $memoryNeeded = ceil(
             (
                 $this->info->getWidth() 
@@ -790,7 +780,7 @@ class ImageHelper
         );
 
         // ini_get('memory_limit') only works if compiled with "--enable-memory-limit".
-        // Also, default memory limit is 8MB, so we will stick with that.
+        // Also, the default memory limit is 8MB, so we will stick with that.
         $memoryLimit = 8 * $MB;
             
         if (function_exists('memory_get_usage') && memory_get_usage() + $memoryNeeded > $memoryLimit) {
@@ -885,7 +875,13 @@ class ImageHelper
      */
     public static function getImageType(string $extension) : ?string
     {
-        return self::$imageTypes[$extension] ?? null;
+        $formats = FormatsCollection::getInstance();
+
+        if(!$formats->extensionExists($extension)) {
+            return null;
+        }
+
+        return $formats->getByExtension($extension)->getID();
     }
 
     /**
@@ -893,8 +889,7 @@ class ImageHelper
      */
     public static function getImageTypes() : array
     {
-        $types = array_values(self::$imageTypes);
-        return array_unique($types);
+        return FormatsCollection::getInstance()->getIDs();
     }
     
    /**
@@ -927,15 +922,13 @@ class ImageHelper
      *
      * @throws ImageHelper_Exception
      * @see ImageHelper::ERROR_INVALID_STREAM_IMAGE_TYPE
-     * @see ImageHelper::$streamTypes
      */
     public static function requireValidStreamType(string $imageType) : string
     {
-        $imageType = strtolower($imageType);
+        $format = FormatsCollection::getInstance()->findByIDOrExtension($imageType);
 
-        if(in_array($imageType, self::$streamTypes))
-        {
-            return $imageType;
+        if($format !== null && $format->isStreamable()) {
+            return $format->getID();
         }
 
         throw new ImageHelper_Exception(
@@ -1026,7 +1019,7 @@ class ImageHelper
      * Retrieves a color definition by its index.
      *
      * @param resource $img A valid image resource.
-     * @param int $colorIndex The color index, as returned by `imagecolorat` for example.
+     * @param int $colorIndex The color index, as returned by `imagecolorat`, for example.
      * @return RGBAColor An array with red, green, blue and alpha keys.
      *
      * @throws ImageHelper_Exception
@@ -1134,7 +1127,7 @@ class ImageHelper
     }
     
    /**
-    * Creates a new image resource, with transparent background.
+    * Creates a new image resource, with a transparent background.
     * 
     * @param int $width
     * @param int $height
@@ -1330,7 +1323,7 @@ class ImageHelper
     public function fitText(string $text, int $matchWidth) : ComputedTextSize
     {
         /**
-         * @var ComputedTextSize[]
+         * @var $sizes ComputedTextSize[]
          */
         $sizes = array();
 
@@ -1401,7 +1394,7 @@ class ImageHelper
      * an existing image resource.
      *
      * @param resource|GdImage|string $pathOrResource
-     * @return ImageHelper_Size Size object, can also be accessed like the traditional array from getimagesize
+     * @return ImageHelper_Size Size object. Can also be accessed like the traditional array from `getimagesize`.
      * @throws ClassNotExistsException
      * @throws ClassNotImplementsException
      * @throws ImageHelper_Exception
@@ -1525,9 +1518,9 @@ class ImageHelper
         // calculate the x and y units of the document:
 	    // @see http://tutorials.jenkov.com/svg/svg-viewport-view-box.html#viewbox
 	    //
-	    // The viewbox combined with the width and height of the svg
+	    // The `viewbox` combined with the width and height of the svg
 	    // allow calculating how many pixels are in one unit of the 
-	    // width and height of the document.
+	    // document's width and height.
         //
 	    $xUnits = $svgWidth / $boxWidth;
 	    $yUnits = $svgHeight / $boxHeight;
