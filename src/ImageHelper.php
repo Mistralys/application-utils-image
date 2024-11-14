@@ -9,12 +9,14 @@ namespace AppUtils;
 
 use AppUtils\ClassHelper\ClassNotExistsException;
 use AppUtils\ClassHelper\ClassNotImplementsException;
+use AppUtils\Collections\CollectionException;
 use AppUtils\ImageHelper\ComputedTextSize;
 use AppUtils\ImageHelper\ImageFormats\Formats\GIFImage;
 use AppUtils\ImageHelper\ImageFormats\Formats\JPEGImage;
 use AppUtils\ImageHelper\ImageFormats\Formats\PNGImage;
 use AppUtils\ImageHelper\ImageFormats\Formats\SVGImage;
 use AppUtils\ImageHelper\ImageFormats\FormatsCollection;
+use AppUtils\ImageHelper\ImageFormats\ImageFormatInterface;
 use AppUtils\ImageHelper\ImageTrimmer;
 use AppUtils\RGBAColor\ColorException;
 use AppUtils\RGBAColor\ColorFactory;
@@ -1687,5 +1689,17 @@ class ImageHelper
         OutputBuffering::start();
         imagepng($this->newImage);
         return md5(OutputBuffering::get());
+    }
+
+    /**
+     * Gets the image format for the current image, which offers
+     * additional meta-information about the image type.
+     *
+     * @return ImageFormatInterface
+     * @throws CollectionException
+     */
+    public function getImageFormat() : ImageFormatInterface
+    {
+        return FormatsCollection::getInstance()->getByID($this->getType());
     }
 }
