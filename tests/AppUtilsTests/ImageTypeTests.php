@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace AppUtilsTests;
 
 use AppUtils\ImageHelper;
+use AppUtils\ImageHelper\ImageFormats\Formats\JPEGImage;
 use PHPUnit\Framework\TestCase;
 
 final class ImageTypeTests extends TestCase
@@ -42,5 +43,13 @@ final class ImageTypeTests extends TestCase
         $this->assertTrue(ImageHelper::createFromFile(__DIR__ . '/../assets/ImageHelper/test-image-24-bit.png')->isTypePNG());
         $this->assertTrue(ImageHelper::createFromFile(__DIR__ . '/../assets/ImageHelper/test-image.svg')->isTypeSVG());
         $this->assertTrue(ImageHelper::createFromFile(__DIR__ . '/../assets/ImageHelper/test-image-gif-16-colors.gif')->isTypeGIF());
+    }
+
+    public function test_getFormat() : void
+    {
+        $helper = ImageHelper::createFromFile(__DIR__ . '/../assets/ImageHelper/test-image.jpg');
+        $format = $helper->getImageFormat();
+
+        $this->assertInstanceOf(JPEGImage::class, $format);
     }
 }
