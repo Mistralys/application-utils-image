@@ -10,7 +10,9 @@ namespace AppUtils;
 use AppUtils\ClassHelper\ClassNotExistsException;
 use AppUtils\ClassHelper\ClassNotImplementsException;
 use AppUtils\Collections\CollectionException;
+use AppUtils\FileHelper\FileInfo;
 use AppUtils\ImageHelper\ComputedTextSize;
+use AppUtils\ImageHelper\ImageFiles\ImageFileInterface;
 use AppUtils\ImageHelper\ImageFormats\Formats\GIFImage;
 use AppUtils\ImageHelper\ImageFormats\Formats\JPEGImage;
 use AppUtils\ImageHelper\ImageFormats\Formats\PNGImage;
@@ -22,6 +24,7 @@ use AppUtils\RGBAColor\ColorException;
 use AppUtils\RGBAColor\ColorFactory;
 use GdImage;
 use JsonException;
+use SplFileInfo;
 
 /**
  * Image helper class that can be used to transform images,
@@ -220,16 +223,16 @@ class ImageHelper
      * Factory method: creates an image helper from an
      * image file on disk.
      *
-     * @param string $file
+     * @param string|ImageFileInterface|FileInfo|SplFileInfo $file
      * @return ImageHelper
      *
      * @throws ClassNotExistsException
      * @throws ClassNotImplementsException
      * @throws ImageHelper_Exception
      */
-    public static function createFromFile(string $file) : ImageHelper
+    public static function createFromFile($file) : ImageHelper
     {
-        return new ImageHelper($file, null, self::getFileImageType($file));
+        return new ImageHelper((string)$file, null, self::getFileImageType($file));
     }
     
    /**
