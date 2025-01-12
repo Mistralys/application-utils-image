@@ -6,6 +6,7 @@
         <cache>
           <versions>
             <info id="LocalF:\EasyPHP\eds-www\tools\application-utils-image\vendor\autoload.php" version="9.6.13" />
+            <info id="Local\vendor/autoload.php" version="9.6.22" />
           </versions>
         </cache>
       </tool>
