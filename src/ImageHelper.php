@@ -727,7 +727,7 @@ class ImageHelper
     /**
      * Sets the quality for image types like jpg that use compression.
      *
-     * @param int $quality
+     * @param int $quality 0-100
      * @return ImageHelper
      * @throws ImageHelper_Exception
      */
