@@ -6,6 +6,7 @@ namespace AppUtilsTests;
 
 use AppUtils\FileHelper\FileInfo;
 use AppUtils\ImageHelper\ImageFormats\FormatsCollection;
+use ImageHelper\ImageFiles\FileTypes\GIFFile;
 use PHPUnit\Framework\TestCase;
 
 final class GIFFormatTests extends TestCase
@@ -19,5 +20,11 @@ final class GIFFormatTests extends TestCase
 
         $this->assertFalse($format->fileHasAnimation(FileInfo::factory(self::TEST_FILE_16_COLORS)));
         $this->assertTrue($format->fileHasAnimation(FileInfo::factory(self::TEST_FILE_ANIMATED)));
+    }
+
+    public function test_isAnimatedViaGIFFile() : void
+    {
+        $this->assertTrue(GIFFile::factory(self::TEST_FILE_ANIMATED)->hasAnimation());
+        $this->assertTrue(GIFFile::factory(self::TEST_FILE_ANIMATED)->isAnimated());
     }
 }

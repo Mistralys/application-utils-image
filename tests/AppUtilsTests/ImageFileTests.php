@@ -10,6 +10,7 @@ use AppUtils\ImageHelper\ImageFiles\FileTypes\JPGFile;
 use AppUtils\ImageHelper\ImageFiles\FileTypes\PNGFile;
 use AppUtils\ImageHelper\ImageFiles\FileTypes\SVGFile;
 use AppUtilsTestClasses\ImageHelperTestCase;
+use ImageHelper\ImageFiles\FileTypes\GIFFile;
 
 final class ImageFileTests extends ImageHelperTestCase
 {
@@ -31,5 +32,10 @@ final class ImageFileTests extends ImageHelperTestCase
     public function test_SVGFile() : void
     {
         $this->assertInstanceOf(SVGFile::class, FileInfo::factory('test.svg'));
+    }
+
+    public function test_GIFFile() : void
+    {
+        $this->assertInstanceOf(GIFFile::class, FileInfo::factory('test.gif'));
     }
 }
