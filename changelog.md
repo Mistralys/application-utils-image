@@ -1,7 +1,7 @@
 # File Helper Changelog
 
 ## v1.2.0 - Added image file classes
-- ImageHelper: Added image file classes `JPGFile`, `PNGFile` and `SVGFile`.
+- ImageHelper: Added image file classes `GIFile`, `JPGFile`, `PNGFile` and `SVGFile`.
 
 ## v1.1.1 - Minor enhancements
 - ImageHelper: Added the method `getImageFormat()` to get the format of the current image.
