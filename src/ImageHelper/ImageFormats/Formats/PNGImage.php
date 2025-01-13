@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 namespace AppUtils\ImageHelper\ImageFormats\Formats;
 
+use AppUtils\ImageHelper\ImageFiles\FileTypes\PNGFile;
 use AppUtils\ImageHelper\ImageFormats\BaseBitmapFormat;
 
 /**
@@ -27,7 +28,7 @@ class PNGImage extends BaseBitmapFormat
 
     public function getExtensions() : array
     {
-        return array('png');
+        return array(PNGFile::EXTENSION);
     }
 
     public function isAnimatable(): bool

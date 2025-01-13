@@ -8,6 +8,8 @@ declare(strict_types=1);
 
 namespace AppUtils\ImageHelper\ImageFormats\Formats;
 
+use AppUtils\ImageHelper\ImageFiles\FileTypes\JPEGFile;
+use AppUtils\ImageHelper\ImageFiles\FileTypes\JPGFile;
 use AppUtils\ImageHelper\ImageFormats\BaseBitmapFormat;
 
 /**
@@ -27,7 +29,7 @@ class JPEGImage extends BaseBitmapFormat
 
     public function getExtensions() : array
     {
-        return array('jpg', 'jpeg');
+        return array(JPGFile::EXTENSION, JPEGFile::EXTENSION);
     }
 
     public function isAnimatable(): bool

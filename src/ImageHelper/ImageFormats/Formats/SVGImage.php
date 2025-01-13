@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 namespace AppUtils\ImageHelper\ImageFormats\Formats;
 
+use AppUtils\ImageHelper\ImageFiles\FileTypes\SVGFile;
 use AppUtils\ImageHelper\ImageFormats\BaseImageFormat;
 
 /**
@@ -27,7 +28,7 @@ class SVGImage extends BaseImageFormat
 
     public function getExtensions() : array
     {
-        return array('svg');
+        return array(SVGFile::EXTENSION);
     }
 
     public function isStreamable() : bool
