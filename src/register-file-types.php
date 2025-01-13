@@ -15,6 +15,7 @@ use AppUtils\ImageHelper\ImageFiles\FileTypes\JPEGFile;
 use AppUtils\ImageHelper\ImageFiles\FileTypes\JPGFile;
 use AppUtils\ImageHelper\ImageFiles\FileTypes\PNGFile;
 use AppUtils\ImageHelper\ImageFiles\FileTypes\SVGFile;
+use ImageHelper\ImageFiles\FileTypes\GIFFile;
 
 registerFileTypes();
 
@@ -33,4 +34,5 @@ function registerFileTypes() : void
     ExtensionClassRegistry::registerExtensionClass(JPGFile::EXTENSION, JPGFile::class);
     ExtensionClassRegistry::registerExtensionClass(JPEGFile::EXTENSION, JPEGFile::class);
     ExtensionClassRegistry::registerExtensionClass(SVGFile::EXTENSION, SVGFile::class);
+    ExtensionClassRegistry::registerExtensionClass(GIFFile::EXTENSION, GIFFile::class);
 }

@@ -10,6 +10,7 @@ namespace AppUtils\ImageHelper\ImageFormats\Formats;
 
 use AppUtils\FileHelper\FileInfo;
 use AppUtils\ImageHelper\ImageFormats\BaseBitmapFormat;
+use ImageHelper\ImageFiles\FileTypes\GIFFile;
 
 /**
  * The GIF image format.
@@ -28,7 +29,7 @@ class GIFImage extends BaseBitmapFormat
 
     public function getExtensions(): array
     {
-        return array('gif');
+        return array(GIFFile::EXTENSION);
     }
 
     public function isAnimatable() : bool
